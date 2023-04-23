@@ -30,8 +30,10 @@ function addItem(e) {
     element.classList.add("grocery-item");
     // add id
     const attr = document.createAttribute("data-id");
+    attr.value = id;
     element.setAttributeNode(attr);
-    console.log(element.dataset.id);
+    element.classList.add("grocery-item");
+    // console.log(`add Id ${element.dataset.id}`);
     element.innerHTML = `<p class="title">${value}</p>
     <div class="btn-container">
     <!-- edit btn -->
@@ -43,6 +45,7 @@ function addItem(e) {
         <i class="fas fa-trash"></i>
       </button>
     </div>`;
+
     const editBtn = element.querySelector(".edit-btn");
     const deleteBtn = element.querySelector(".delete-btn");
 
@@ -52,7 +55,7 @@ function addItem(e) {
 
     // append child
     list.appendChild(element);
-    // display alertf
+    // display alert
     displayAlert("item added", "success");
     // show container
     container.classList.add("show-container");
@@ -101,15 +104,15 @@ function removeItems() {
 function deleteItem(e) {
   const element = e.currentTarget.parentElement.parentElement;
   const id = element.dataset.id;
-  console.log(element);
+  console.log(`dell id ${id}`);
   list.removeChild(element);
   if (list.children.length === 0) {
     container.classList.remove("show-container");
-    displayAlert("item removed", "danger");
-    setBackToDefault();
-    // remove from local storage
-    removeFromLocalStorage(id);
   }
+  displayAlert("item removed", "danger");
+  setBackToDefault();
+  // remove from local storage
+  removeFromLocalStorage(id);
 }
 
 // edit item
@@ -138,21 +141,23 @@ function setBackToDefault() {
 // add to local storage
 function addToLocalStorage(id, value) {
   // console.log(`${id}, ${value}`);
-  const groceryItem = { id, value };
+  const grocery = { id, value };
   const items = getLocalStorage();
-  items.push(groceryItem);
+  items.push(grocery);
   localStorage.setItem("list", JSON.stringify(items));
   // console.log(items);
 }
 
 // remove from local storage
 function removeFromLocalStorage(id) {
+  console.log(`org id: ${id}, ${id.value}, ${typeof id}, ${id.length}`);
   let items = getLocalStorage();
   items = items.filter(function (item) {
     if (item.id !== id) {
       return item;
     }
   });
+  console.log(`not matching: ${JSON.stringify(items)}`);
   localStorage.setItem("list", JSON.stringify(items));
 }
 // edit local storage
