@@ -18,8 +18,6 @@ let editId = "";
 form.addEventListener("submit", addItem);
 // clear list
 clearBtn.addEventListener("click", removeItems);
-// Delete item
-// .addEventListener("click", deleteItem)
 
 // ****** FUNCTIONS **********
 function addItem(e) {
@@ -33,9 +31,10 @@ function addItem(e) {
     // add id
     const attr = document.createAttribute("data-id");
     element.setAttributeNode(attr);
+    console.log(element.dataset.id);
     element.innerHTML = `<p class="title">${value}</p>
     <div class="btn-container">
-      <!-- edit btn -->
+    <!-- edit btn -->
       <button type="button" class="edit-btn">
         <i class="fas fa-edit"></i>
       </button>
@@ -51,7 +50,6 @@ function addItem(e) {
     editBtn.addEventListener("click", editItem);
     deleteBtn.addEventListener("click", deleteItem);
 
-
     // append child
     list.appendChild(element);
     // display alertf
@@ -62,7 +60,10 @@ function addItem(e) {
     // set back to default
     setBackToDefault();
   } else if (value && editFlag) {
-    console.log("Editing");
+    editElement.innerHTML = value;
+    displayAlert("item edited", "success");
+    editLocalStorage(editId, value);
+    setBackToDefault();
   } else {
     displayAlert("please enter the value", "danger");
   }
@@ -94,19 +95,20 @@ function removeItems() {
   container.classList.remove("show-container");
   displayAlert("Removed Everything", "danger");
   setBackToDefault();
-  // localStorage.removeItem("list");
+  localStorage.removeItem("list");
 }
 // delete item
 function deleteItem(e) {
   const element = e.currentTarget.parentElement.parentElement;
   const id = element.dataset.id;
+  console.log(element);
   list.removeChild(element);
   if (list.children.length === 0) {
     container.classList.remove("show-container");
     displayAlert("item removed", "danger");
     setBackToDefault();
     // remove from local storage
-    // removeFromLocalStorage(id);
+    removeFromLocalStorage(id);
   }
 }
 
@@ -121,8 +123,6 @@ function editItem(e) {
   editFlag = true;
   editId = element.dataset.id;
   submitBtn.textContent = "edit";
-  
-
 }
 
 // set backt to defaults
@@ -137,11 +137,31 @@ function setBackToDefault() {
 
 // add to local storage
 function addToLocalStorage(id, value) {
-  console.log("added to the local storage");
+  // console.log(`${id}, ${value}`);
+  const groceryItem = { id, value };
+  const items = getLocalStorage();
+  items.push(groceryItem);
+  localStorage.setItem("list", JSON.stringify(items));
+  // console.log(items);
 }
 
 // remove from local storage
-function removeFromLocalStorage(id) {}
+function removeFromLocalStorage(id) {
+  let items = getLocalStorage();
+  items = items.filter(function (item) {
+    if (item.id !== id) {
+      return item;
+    }
+  });
+  localStorage.setItem("list", JSON.stringify(items));
+}
+// edit local storage
+function editLocalStorage(id, value) {}
+function getLocalStorage() {
+  return localStorage.getItem("list")
+    ? JSON.parse(localStorage.getItem("list"))
+    : [];
+}
 // SETUP LOCALSTORAGE.REMOVEITEM('LIST');
 
 // ****** setup items **********
