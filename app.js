@@ -18,6 +18,8 @@ let editId = "";
 form.addEventListener("submit", addItem);
 // clear list
 clearBtn.addEventListener("click", removeItems);
+// get items from localStorage
+window.addEventListener("DOMContentLoaded", setupItems);
 
 // ****** FUNCTIONS **********
 function addItem(e) {
@@ -25,39 +27,9 @@ function addItem(e) {
   const value = grocery.value;
   const id = new Date().getTime().toString();
   if (value && !editFlag) {
-    const element = document.createElement("article");
-    // add class
-    element.classList.add("grocery-item");
-    // add id
-    const attr = document.createAttribute("data-id");
-    attr.value = id;
-    element.setAttributeNode(attr);
-    element.classList.add("grocery-item");
-    element.innerHTML = `<p class="title">${value}</p>
-    <div class="btn-container">
-    <!-- edit btn -->
-      <button type="button" class="edit-btn">
-        <i class="fas fa-edit"></i>
-      </button>
-      <!-- delete btn -->
-      <button type="button" class="delete-btn">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>`;
-
-    const editBtn = element.querySelector(".edit-btn");
-    const deleteBtn = element.querySelector(".delete-btn");
-
-    // edit and delete buttons
-    editBtn.addEventListener("click", editItem);
-    deleteBtn.addEventListener("click", deleteItem);
-
-    // append child
-    list.appendChild(element);
+    createItem(id, value);
     // display alert
     displayAlert("item added", "success");
-    // show container
-    container.classList.add("show-container");
     addToLocalStorage(id, value);
     // set back to default
     setBackToDefault();
@@ -85,7 +57,38 @@ function displayAlert(text, action) {
 }
 
 // add item
+function createItem(id, value) {
+  const element = document.createElement("article");
+  // add class
+  element.classList.add("grocery-item");
+  // add id
+  const attr = document.createAttribute("data-id");
+  attr.value = id;
+  element.setAttributeNode(attr);
+  element.innerHTML = `<p class="title">${value}</p>
+    <div class="btn-container">
+    <!-- edit btn -->
+      <button type="button" class="edit-btn">
+        <i class="fas fa-edit"></i>
+      </button>
+      <!-- delete btn -->
+      <button type="button" class="delete-btn">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>`;
 
+  const editBtn = element.querySelector(".edit-btn");
+  const deleteBtn = element.querySelector(".delete-btn");
+
+  // edit and delete buttons
+  editBtn.addEventListener("click", editItem);
+  deleteBtn.addEventListener("click", deleteItem);
+
+  // append child
+  list.appendChild(element);
+
+  container.classList.add("show-container");
+}
 // clear items
 function removeItems() {
   const items = document.querySelectorAll(".grocery-item");
@@ -109,7 +112,6 @@ function deleteItem(e) {
   }
   displayAlert("item removed", "danger");
   setBackToDefault();
-  // remove from local storage
   removeFromLocalStorage(id);
 }
 
@@ -134,7 +136,7 @@ function setBackToDefault() {
   submitBtn.textContent = "submit";
 }
 
-// ****** local storage **********
+// ****** LOCAL STORAGE **********
 
 // add to local storage
 function addToLocalStorage(id, value) {
@@ -155,12 +157,31 @@ function removeFromLocalStorage(id) {
   localStorage.setItem("list", JSON.stringify(items));
 }
 // edit local storage
-function editLocalStorage(id, value) {}
+function editLocalStorage(id, value) {
+  console.log("Edited");
+  let items = getLocalStorage();
+  items = items.map((item) => {
+    if (item.id === id) {
+      item.value = value;
+    }
+    return item;
+  });
+  localStorage.setItem("list", JSON.stringify(items));
+}
 function getLocalStorage() {
   return localStorage.getItem("list")
     ? JSON.parse(localStorage.getItem("list"))
     : [];
 }
-// SETUP LOCALSTORAGE.REMOVEITEM('LIST');
 
 // ****** setup items **********
+
+function setupItems() {
+  let items = getLocalStorage();
+  if (items.length > 0) {
+    items.forEach((item) => {
+      createItem(item.id, item.value);
+    });
+  }
+  displayAlert("Items loaded", "success");
+}
