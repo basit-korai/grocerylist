@@ -33,7 +33,6 @@ function addItem(e) {
     attr.value = id;
     element.setAttributeNode(attr);
     element.classList.add("grocery-item");
-    // console.log(`add Id ${element.dataset.id}`);
     element.innerHTML = `<p class="title">${value}</p>
     <div class="btn-container">
     <!-- edit btn -->
@@ -104,7 +103,6 @@ function removeItems() {
 function deleteItem(e) {
   const element = e.currentTarget.parentElement.parentElement;
   const id = element.dataset.id;
-  console.log(`dell id ${id}`);
   list.removeChild(element);
   if (list.children.length === 0) {
     container.classList.remove("show-container");
@@ -140,24 +138,20 @@ function setBackToDefault() {
 
 // add to local storage
 function addToLocalStorage(id, value) {
-  // console.log(`${id}, ${value}`);
   const grocery = { id, value };
   const items = getLocalStorage();
   items.push(grocery);
   localStorage.setItem("list", JSON.stringify(items));
-  // console.log(items);
 }
 
 // remove from local storage
 function removeFromLocalStorage(id) {
-  console.log(`org id: ${id}, ${id.value}, ${typeof id}, ${id.length}`);
   let items = getLocalStorage();
   items = items.filter(function (item) {
     if (item.id !== id) {
       return item;
     }
   });
-  console.log(`not matching: ${JSON.stringify(items)}`);
   localStorage.setItem("list", JSON.stringify(items));
 }
 // edit local storage
